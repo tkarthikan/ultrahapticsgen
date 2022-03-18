@@ -1,0 +1,60 @@
+ld: warning: ignoring file /Library/Frameworks/UltraleapHaptics.framework/Versions/3.0/UltraleapHaptics, building for macOS-arm64 but attempting to link with file built for macOS-x86_64
+Undefined symbols for architecture arm64:
+  "Ultraleap::Haptics::VersionInfo::checkVersion(unsigned int, unsigned int, unsigned int)", referenced from:
+      Ultraleap::Haptics::VersionInfo::checkVersion() in main.cpp.o
+  "Ultraleap::Haptics::AppVersionInfo::AppVersionInfo(char const*, unsigned short, unsigned short, unsigned short, unsigned short, char const*)", referenced from:
+      Ultraleap::Haptics::Library::Library() in main.cpp.o
+  "Ultraleap::Haptics::AppVersionInfo::AppVersionInfo(Ultraleap::Haptics::AppVersionInfo const&)", referenced from:
+      Ultraleap::Haptics::Library::Library(Ultraleap::Haptics::AppVersionInfo) in main.cpp.o
+  "Ultraleap::Haptics::AppVersionInfo::~AppVersionInfo()", referenced from:
+      Ultraleap::Haptics::Library::Library() in main.cpp.o
+      Ultraleap::Haptics::Library::Library(Ultraleap::Haptics::AppVersionInfo) in main.cpp.o
+  "Ultraleap::Haptics::OutputInterval::end()", referenced from:
+      circle_callback(Ultraleap::Haptics::StreamingEmitter const&, Ultraleap::Haptics::OutputInterval&, std::__1::chrono::time_point<std::__1::chrono::steady_clock, std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l> > > const&, void*) in main.cpp.o
+  "Ultraleap::Haptics::OutputInterval::begin()", referenced from:
+      circle_callback(Ultraleap::Haptics::StreamingEmitter const&, Ultraleap::Haptics::OutputInterval&, std::__1::chrono::time_point<std::__1::chrono::steady_clock, std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l> > > const&, void*) in main.cpp.o
+  "Ultraleap::Haptics::StreamingEmitter::setEmissionCallback(void (*)(Ultraleap::Haptics::StreamingEmitter const&, Ultraleap::Haptics::OutputInterval&, std::__1::chrono::time_point<std::__1::chrono::steady_clock, std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l> > > const&, void*), void*)", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::StreamingEmitter::setControlPointCount(unsigned long, Ultraleap::Haptics::AdjustRate)", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::StreamingEmitter::start()", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::StreamingEmitter::StreamingEmitter(Ultraleap::Haptics::Library)", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::StreamingEmitter::~StreamingEmitter()", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::OutputIntervalIterator::operator*()", referenced from:
+      circle_callback(Ultraleap::Haptics::StreamingEmitter const&, Ultraleap::Haptics::OutputInterval&, std::__1::chrono::time_point<std::__1::chrono::steady_clock, std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l> > > const&, void*) in main.cpp.o
+  "Ultraleap::Haptics::OutputIntervalIterator::operator++()", referenced from:
+      circle_callback(Ultraleap::Haptics::StreamingEmitter const&, Ultraleap::Haptics::OutputInterval&, std::__1::chrono::time_point<std::__1::chrono::steady_clock, std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l> > > const&, void*) in main.cpp.o
+  "Ultraleap::Haptics::TimePointOnOutputInterval::controlPoint(unsigned long)", referenced from:
+      circle_callback(Ultraleap::Haptics::StreamingEmitter const&, Ultraleap::Haptics::OutputInterval&, std::__1::chrono::time_point<std::__1::chrono::steady_clock, std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l> > > const&, void*) in main.cpp.o
+  "Ultraleap::Haptics::Device::Device(Ultraleap::Haptics::Device const&)", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::Device::~Device()", referenced from:
+      _main in main.cpp.o
+      tl::detail::expected_storage_base<Ultraleap::Haptics::Device, Ultraleap::Haptics::Error, false, true>::~expected_storage_base() in main.cpp.o
+  "Ultraleap::Haptics::Emitter::stop()", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::Emitter::addDevice(Ultraleap::Haptics::Device)", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::Library::findDevice(Ultraleap::Haptics::DeviceFeatures)", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::Library::init(Ultraleap::Haptics::AppVersionInfo)", referenced from:
+      Ultraleap::Haptics::Library::Library(Ultraleap::Haptics::AppVersionInfo) in main.cpp.o
+  "Ultraleap::Haptics::Library::connect()", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::Library::Library(Ultraleap::Haptics::Library const&)", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::Library::~Library()", referenced from:
+      _main in main.cpp.o
+  "Ultraleap::Haptics::OutputIntervalIterator::operator!=(Ultraleap::Haptics::OutputIntervalIterator const&) const", referenced from:
+      circle_callback(Ultraleap::Haptics::StreamingEmitter const&, Ultraleap::Haptics::OutputInterval&, std::__1::chrono::time_point<std::__1::chrono::steady_clock, std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l> > > const&, void*) in main.cpp.o
+  "vtable for Ultraleap::Haptics::Library", referenced from:
+      Ultraleap::Haptics::Library::Library(Ultraleap::Haptics::AppVersionInfo) in main.cpp.o
+  NOTE: a missing vtable usually means the first non-inline virtual member function has no definition.
+ld: symbol(s) not found for architecture arm64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[2]: *** [TestProject] Error 1
+make[1]: *** [CMakeFiles/TestProject.dir/all] Error 2
+make: *** [all] Error 2
