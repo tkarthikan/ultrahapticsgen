@@ -7,16 +7,15 @@ import threading
 import time
 from ctypes import *
 
-filename = "/Users/karthik/Documents/GenHap/UH_Multithread/build/libuhdriver.so" 
-lib = ctypes.cdll.LoadLibrary(filename)
+filename = 'C:\\Users\\andy9\\Dev\\Ultraleap-Haptics-3.0.0-beta.10-Windows-Win64-Research\\genhap\\uhmultithread\\build\\Release\\uhdriver.dll'
+lib = ctypes.WinDLL(filename)
 
-alter_me = lib.alter_me
-alter_me.argtypes = c_char_p,c_size_t
-alter_me.restype = None
+# alter_me = lib.alter_me
+# alter_me.argtypes = c_char_p,c_size_t
+# alter_me.restype = None
 
-
-data = create_string_buffer(b'/Users/karthik/Documents/GenHap/UH_Multithread/build/lineseven4_8_100hz_0005s.csv' ,size=200)
-alter_me(data,sizeof(data))
+data = create_string_buffer(b'C:\\Users\\andy9\\Dev\\Ultraleap-Haptics-3.0.0-beta.10-Windows-Win64-Research\\genhap\\data\\csv\\0.csv',size=200)
+lib.alter_me(data,sizeof(data))
 lib.csvfile()
 
 # # The array will run in a thread in the background, waiting for the rest of our instrunctions

@@ -21,7 +21,9 @@
     #define M_PI 3.14159265358979323
 #endif
 
-#define EXPORT_DECORATION 
+#define EXPORT_DECORATION
+
+#define DllExport __declspec( dllexport )
 
 using namespace Ultraleap::Haptics;
 
@@ -103,7 +105,7 @@ extern "C"{
     std::string filename = "/Users/karthik/Documents/GenHap/UH_Multithread/build/lineseven4_8_100hz_0005ss.csv";
     int restartflag = 0; 
 
-    void alter_me(char* param, size_t length) {
+    __declspec(dllexport) void alter_me(char* param, size_t length) {
         // truncates if additional info exceeds length
         std::cout << "Fname found"<<std::endl;
         filename = param;
@@ -113,7 +115,7 @@ extern "C"{
 
     
 
-	void csvfile()
+	__declspec(dllexport) void csvfile()
 	{   
         std::cout << "Filename check: " <<filename<<std::endl;
 	}
@@ -123,7 +125,7 @@ extern "C"{
 
     // }
 
-    int main()
+    __declspec(dllexport) int main(bool verbose=true)
     {
         // Create a Library object and connect it to a running service
         Library lib;
@@ -191,7 +193,7 @@ extern "C"{
         circle_data.z_samples = (std::atomic<double> *) malloc(size*sizeof(std::atomic<double>));
 
         std::ifstream file(filename);
-        float data[sample_size][3];
+        auto data = new float [sample_size][3];
         for(int row = 0; row < sample_size; row++)
         {
             std::string line;
@@ -209,9 +211,12 @@ extern "C"{
                 std::stringstream convertor(val);
                 convertor >> data[row][col];
 
-                printf("Row: %d  ",row);
-                printf("Col: %d  ",col);
-                printf("%f\n",data[row][col]);
+                if (verbose){
+                    printf("Row: %d  ",row);
+                    printf("Col: %d  ",col);
+                    printf("%f\n",data[row][col]);
+                }
+
                 if (col==0)
                     circle_data.i_samples[row] = data[row][col];
                 else if (col==1)
