@@ -6,9 +6,14 @@ import pandas as pd
 from ctypes import *
 import argparse
 import random
+import threading
+import time
 
 DATA_PATH = 'data/'
 CSV_DATA_PATH = 'data/csv/'
+
+filename = 'C:\\Users\\andy9\\Dev\\Ultraleap-Haptics-3.0.0-beta.10-Windows-Win64-Research\\genhap\\uhmultithread\\build\\Release\\uhdriver.dll'
+lib = ctypes.WinDLL(filename)
 
 # unchanged
 f_s = 20e3 #for some reasons SDK run at 20kHz, so we set our sampling rate frequency to 20k
@@ -22,6 +27,7 @@ end_time = 0.05 # (duration) we are going to produce 0.05s long stimuli
 sample = 0
 
 parser = argparse.ArgumentParser(description='Define testing configurations')
+parser.add_argument('-n', '--name', type=str, default='dataset', help='name of the dataset')
 parser.add_argument('-c', '--category', type=str, default='circle', help='shape of generated samples')
 parser.add_argument('-s','--samples', type=int, default=0, help='number of samples to automatically generate')
 
@@ -31,10 +37,10 @@ print('Creating generated samples for category: {}'.format(category))
 
 def seven(intensity, size, f_stm):
     length = 0.04 * size
-    v = length*f_stm 
+    v = length*f_stm
 
     length1 = 0.08 * size
-    v2 = length1*f_stm 
+    v2 = length1*f_stm
 
     #line with a jump on one end:
     # x_pos_jump = np.mod(t*v, length) - length/2 
@@ -130,12 +136,11 @@ while True:
         # automatic testing
         if (itr >= args.samples): break
         
-        end_time = random.uniform(0, 1) # duration
-        intensity = random.uniform(0, 1) # intensity
-        size = float(random.randrange(100, 300))/100
-        f_stm = random.randint(1, 400) # frequency in Hz
-        
         # generate random params for end_time, intensity, size, f_stm
+        end_time = round(random.uniform(0, 1), 2) # duration
+        intensity = round(random.uniform(0, 1), 2) # intensity
+        size = float(random.randrange(100, 300))/100
+        f_stm = random.randint(16, 265) # frequency in Hz
 
     inten = None
     x_pos = None
@@ -162,17 +167,18 @@ while True:
     yc = arr_t(*y_pos)
     zc = arr_t(*z_pos.tolist())
 
-    dataset_path = DATA_PATH + 'dataset.csv'
+    dataset_path = DATA_PATH + '{}.csv'.format(args.name)
+    csv_sub_data_path = CSV_DATA_PATH + '{}/'.format(args.name)
 
     # if directory doesn't exist create it
-    if not os.path.exists(CSV_DATA_PATH):
-        os.makedirs(CSV_DATA_PATH)
+    if not os.path.exists(csv_sub_data_path):
+        os.makedirs(csv_sub_data_path)
 
     if os.path.isfile(dataset_path):
         df = pd.read_csv(dataset_path)
         sample = int(df['sample_number'].max()) + 1
 
-    csv_path = CSV_DATA_PATH + '{}.csv'.format(sample)
+    csv_path = csv_sub_data_path + '{}.csv'.format(sample)
 
     print("Creating sample {} ({:.2f}i, {:.2f}t, {:.2f}l, {:.2f}f)".format(sample, intensity, end_time, size, f_stm))
 
@@ -186,7 +192,7 @@ while True:
 
         if os.path.getsize(dataset_path) == 0:
             wr.writerow(['sample_number', 'category', 'intensity', 'duration', 'size', 'frequency', 'path'])
-
+        
         wr.writerow([sample, category,intensity, end_time, size, f_stm, csv_path])
 
     itr += 1
