@@ -8,6 +8,7 @@ import argparse
 import random
 import threading
 import time
+from scipy.spatial import distance
 
 DATA_PATH = 'data/'
 CSV_DATA_PATH = 'data/csv/'
@@ -35,7 +36,7 @@ args = parser.parse_args()
 category = args.category
 print('Creating generated samples for category: {}'.format(category))
 
-def seven(intensity, size, f_stm):
+def seven(intensity, size, f_stm, t):
     length = 0.04 * size
     v = length*f_stm
 
@@ -43,7 +44,7 @@ def seven(intensity, size, f_stm):
     v2 = length1*f_stm
 
     #line with a jump on one end:
-    # x_pos_jump = np.mod(t*v, length) - length/2 
+    # x_pos_jump = np.mod(t*v, length) - length/2
 
     x_pos1 = np.mod(t*v, length)
     y_pos1 = np.zeros((len(t)))
@@ -61,7 +62,7 @@ def seven(intensity, size, f_stm):
 
     return inten_3, x_pos3, y_pos3, z_pos3
 
-def circle(intensity, size, f_stm):
+def circle(intensity, size, f_stm, t):
     radius = 0.02*size # 2cm radius
     height = 0.2*size # 20cm height, i.e. 20cm above the device
 
@@ -79,7 +80,7 @@ def circle(intensity, size, f_stm):
 
     return inten, x_pos, y_pos, z_pos
 
-def square(intensity, size, f_stm):
+def square(intensity, size, f_stm, t):
     side = 0.1*size
     length = 4*side
     v = length*f_stm 
@@ -105,6 +106,70 @@ def square(intensity, size, f_stm):
     inten = np.full(len(t), intensity)
 
     return inten, x_pos, y_pos, z_pos
+
+def compute_polygon(points, t, f_stm):
+    sides = np.zeros(len(points))
+    #first we need to compute the length of the path:
+    for i in np.arange(len(points)):
+        if(i < len(points)-1):
+            sides[i] = distance.euclidean(points[i], points[i+1])
+        else:
+            sides[i] = distance.euclidean(points[i], points[0])
+    length = np.sum(sides)
+    print(length)
+
+    #compute the speed:
+    v = f_stm * length
+
+    #start computing the
+    tmp = np.mod(t*v, length)
+    x_pos = np.zeros_like(t)
+    y_pos = np.zeros_like(t)
+    for i in np.arange(len(points)):
+        if(i == 0): #first line
+            alpha = tmp/sides[0]
+            pos_x = (1-alpha)*points[i,0] + alpha*points[i+1,0]
+            pos_y = (1-alpha)*points[i,1] + alpha*points[i+1,1]
+
+            x_pos += np.where(tmp <= sides[0], pos_x, 0)
+            y_pos += np.where(tmp <= sides[0], pos_y, 0)
+
+        elif(i >= len(points)-1): #last line
+            alpha = (tmp - np.sum(sides[:i]))/sides[i]
+            pos_x = (1-alpha)*points[i,0] + alpha*points[0,0]
+            pos_y = (1-alpha)*points[i,1] + alpha*points[0,1]
+
+            x_pos += np.where(tmp > np.sum(sides[:i]), pos_x, 0)
+            y_pos += np.where(tmp > np.sum(sides[:i]), pos_y, 0)
+
+        else: #all the other lines
+            alpha = (tmp - np.sum(sides[:i]))/sides[i]
+            pos_x = (1-alpha)*points[i,0] + alpha*points[i+1,0]
+            pos_y = (1-alpha)*points[i,1] + alpha*points[i+1,1]
+
+            x_pos += np.where(np.logical_and(tmp > np.sum(sides[:i]), tmp <= np.sum(sides[:i+1])), pos_x, 0)
+            y_pos += np.where(np.logical_and(tmp > np.sum(sides[:i]), tmp <= np.sum(sides[:i+1])), pos_y, 0)
+            
+    return x_pos, y_pos
+
+def triangle(intensity, f_stm, t):
+    #We define a list of points, which will be the verteces of our polygon
+    points = np.array([[0, 0], [1, 0], [0.5, np.sqrt(3)/2]]) #should look like an equilateral triangle
+    x_tri, y_tri = compute_polygon(points, t, f_stm)
+
+    z_pos = np.ones_like(t)
+    inten = np.full(len(t), intensity) 
+
+    return inten, x_tri, y_tri, z_pos
+
+def hexagon(intensity, f_stm, t):
+    points = np.array([[0, 1], [1, 0], [2,0], [3,1], [2,2], [1,2]]) #should look like an hexagon
+    x_hex, y_hex = compute_polygon(points, t, f_stm)
+
+    z_pos = np.ones_like(t)
+    inten = np.full(len(t), intensity)
+
+    return inten, x_hex, y_hex, z_pos
 
 itr = 0 # iteration
 while True:
@@ -152,11 +217,18 @@ while True:
     t = np.arange(0,end_time,1./f_s) #create the vector "time" 
 
     if (category == 'seven'):
-        inten, x_pos, y_pos, z_pos = seven(intensity, size, f_stm)
+        inten, x_pos, y_pos, z_pos = seven(intensity, size, f_stm, t)
     elif (category == 'circle'): # default category
-        inten, x_pos, y_pos, z_pos = circle(intensity, size, f_stm)
+        inten, x_pos, y_pos, z_pos = circle(intensity, size, f_stm, t)
     elif (category == 'square'):
-        inten, x_pos, y_pos, z_pos = square(intensity, size, f_stm)
+        inten, x_pos, y_pos, z_pos = square(intensity, size, f_stm, t)
+    elif (category == 'triangle'):
+        inten, x_pos, y_pos, z_pos = triangle(intensity, f_stm, t)
+    elif (category == 'hexagon'):
+        inten, x_pos, y_pos, z_pos = hexagon(intensity, f_stm, t)
+    else:
+        print("Invalid category")
+        break
 
     # The library takes double as input, so we will create the appropriate casting type, length included
     arr_t = ctypes.c_double * len(x_pos) #type are defined using ctypes
